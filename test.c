@@ -37,7 +37,7 @@ int main()
 	double x_t_s,y_t_s;
 	double a_jdg;
 	
-	fp = fopen("0deg.txt","r");
+	fp = fopen("minus20deg.txt","r");
 //for(a = 0;a < 100;a++){
 	for(i = 0;i < 1081;i++)
 		fscanf(fp,"%d",&data[i]);
@@ -186,14 +186,14 @@ int main()
 		while(1){
 			step[k] = j;
 			k++;
-			if(-0.2 > x_t[j] - x_t[j + 10] || 0.2 < x_t[j] - x_t[j + 10]){
-				if(-0.2 > x_t[j + 10] - x_t[j + 20] || 0.2 < x_t[j + 10] - x_t[j + 20]){
-					if(-0.2 > x_t[j + 20] - x_t[j + 30] || 0.2 < x_t[j + 20] - x_t[j + 30]){
+			if(-0.1 > x_t[j] - x_t[j + 10] || 0.1 < x_t[j] - x_t[j + 10]){
+				if(-0.1 > x_t[j + 10] - x_t[j + 20] || 0.1 < x_t[j + 10] - x_t[j + 20]){
+					if(-0.1 > x_t[j + 20] - x_t[j + 30] || 0.1 < x_t[j + 20] - x_t[j + 30]){
 						break;
 					}
 				}
 			}
-			//printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
+			printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
 			j += 10;
 		}
 		if(k > 4){
@@ -250,7 +250,7 @@ int main()
 			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
 			a_1[i] = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
 			b_1[i] = y_a - (a_1[i] * x_a);
-			//printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
+			printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
 		}
 	}
 	for(i = 180;i < 400;i++){
@@ -262,9 +262,9 @@ int main()
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
 		}
-		if(-1.2 < a_jdg || a_jdg < -0.8)
-			flag = 1;
 	}
+	if(-1.2 < a_jdg && -0.8 > a_jdg)
+		flag = 1;
 
 	//printf("------------------\n");
 
@@ -277,23 +277,25 @@ int main()
 		while(1){
 			step[k] = j;
 			k++;
-			if(-0.2 > x_t[j] - x_t[j - 10] || 0.2 < x_t[j] - x_t[j - 10]){
-				if(-0.2 > x_t[j - 10] - x_t[j - 20] || 0.2 < x_t[j - 10] - x_t[j - 20]){
-					if(-0.2 > x_t[j - 20] - x_t[j - 30] || 0.2 < x_t[j - 20] - x_t[j - 30])
+			if(-0.1 > x_t[j] - x_t[j - 10] || 0.1 < x_t[j] - x_t[j - 10]){
+				if(-0.1 > x_t[j - 10] - x_t[j - 20] || 0.1 < x_t[j - 10] - x_t[j - 20]){
+					if(-0.1 > x_t[j - 20] - x_t[j - 30] || 0.1 < x_t[j - 20] - x_t[j - 30]){
 						break;
+					}
 				}
 			}
-			j += 10;
+			printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
+			j -= 10;
 		}
 		if(k > 4){
 			x_t_s = 0;
-			for(i = 0;i < k;i++)
-				x_t_s += x_t_a[step[i]];
+			for(n = 0;n < k;n++)
+				x_t_s += x_t_a[step[n]];
 			x_t_s /= (float)k;
 			j = 0;
-			for(i = 0;i < k;i++){
-				if(-1.0 > x_t_a[step[i]] - x_t_s || 1.0 < x_t_a[step[i]] - x_t_s){
-					Farther_value[j] = step[i];
+			for(n = 0;n < k;n++){
+				if(-1.0 > x_t_a[step[n]] - x_t_s || 1.0 < x_t_a[step[n]] - x_t_s){
+					Farther_value[j] = step[n];
 					j++;
 				}
 			}
@@ -301,17 +303,17 @@ int main()
 			x_s = 0;
 			y_s = 0;
 			m = 0;
-			for(i = 0;i < k;i++){
+			for(n = 0;n < k;n++){
 				Farther_flag = 0;
 				for(l = 0;l < j;l++){
-					if(step[i] == Farther_value[l]){
+					if(step[n] == Farther_value[l]){
 						Farther_flag = 1;
 						m++;
 					}
 				}
 				if(Farther_flag != 1){
-					x_s += x_t_a[ step[i] ];
-					y_s += y_t_a[ step[i] ];
+					x_s += x_t_a[ step[n] ];
+					y_s += y_t_a[ step[n] ];
 				}
 			}
 			//display
@@ -324,27 +326,28 @@ int main()
 			//Linear equations
 			part_1 = 0;
 			part_2 = 0;
-			for(i = 0;i < k;i++){
+			for(n = 0;n < k;n++){
 				Farther_flag = 0;
 				for(l = 0;l < j;l++){
-					if(step[i] == Farther_value[l])
+					if(step[n] == Farther_value[l])
 						Farther_flag = 1;
 				}
 				if(Farther_flag != 1){
-					part_1 += x_t_a[ step[i] ] * y_t_a[ step[i] ];
-					part_2 += pow( x_t_a[ step[i] ] , 2.0 );
+					part_1 += x_t_a[ step[n] ] * y_t_a[ step[n] ];
+					part_2 += pow( x_t_a[ step[n] ] , 2.0 );
 				}
 			}
 			//display
 			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
 			a_1[i] = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
 			b_1[i] = y_a - (a_1[i] * x_a);
+			printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
 		}
 	}
-	for(i = 180;i < 900;i++){
+	for(i = 900;i > 680;i--){
 		if(flag == 1)
 			break;
-		if(i = 180){
+		if(i == 900){
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
 		}
@@ -352,13 +355,14 @@ int main()
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
 		}
+		printf("%d\n",step_s);
 	}
 	printf("%d  a_1 : %lf     b_1 : %lf\n",step_s,a_1[step_s],b_1[step_s]);
 	
 	//corner
 	x_c = (b_2 - b_1[step_s]) / (a_1[step_s] - a_2);
 	y_c = (a_1[step_s] * x_c) + b_1[step_s];
-	//printf("x_c : %f   y_c : %f\n",x_c,y_c);
+	printf("x_c : %f   y_c : %f\n",x_c,y_c);
 	//reverse corner
 	if(flag == 1){
 		x_cc = -sqrt( pow(X , 2.0) / ( 1 + pow(a_2 , 2.0) ) ) + x_c;
@@ -368,7 +372,7 @@ int main()
 		x_cc = sqrt( pow(X , 2.0) / ( 1 + pow(a_2 , 2.0) ) ) + x_c;
 		y_cc = a_2 * (x_cc - x_c) + y_c;
 	}
-	//printf("x_cc : %f   y_cc : %f\n",x_cc,y_cc);
+	printf("x_cc : %f   y_cc : %f\n",x_cc,y_cc);
 	//distance to corner
 	cldis_1 = sqrt( pow(x_c , 2.0) + pow(y_c , 2.0) );
 	cldis_2 = sqrt( pow(x_cc , 2.0) + pow(y_cc , 2.0) );
