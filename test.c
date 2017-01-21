@@ -9,9 +9,11 @@ int main()
 	FILE *fp;
 	int data[1081] = {0};
 	int step[1081] = {0};
+	int step_max,step_min,step_s;
+	int Farther_value[10] = {0},Farther_flag;
 
 	int a;
-	int i,j,k;	//Variable of if
+	int i,j,k,l,m,n;	//Variable of if
 	int flag;	//Whether a linear approximation
 	
 	double X = 8.0,Y = 4.1,sl = 0.13;	//Tunnel size
@@ -23,16 +25,20 @@ int main()
 	double x_s,y_s;	//sum
 	double x_a,y_a;	//average
 	double part_1,part_2;	//Calculating element of approximate straight line
-	double a_1,b_1;	//Slope and Intercept of wall line
+	double a_1[1081] = {0},b_1[1081] = {0};	//Slope and Intercept of wall line
 	double a_2,b_2;	//Slope and Intercept of bottom line
 	double x_c,y_c,x_cc,y_cc;	//Corner coordinates
 	double cldis_1,cldis_2;	//Distance to corner
 	double diff_1,diff_2,difference;	//Detection of corner step number
 	double step_1,step_2;	//Number of steps in the corner
 	double x_0,cldis_0;	//Coordinates and distance of 180th step
+	double max,min;
+	double x_t_a[1081] = {0},y_t_a[1081] = {0};
+	double x_t_s,y_t_s;
+	double a_jdg;
 	
 	fp = fopen("0deg.txt","r");
-for(a = 0;a < 100;a++){
+//for(a = 0;a < 100;a++){
 	for(i = 0;i < 1081;i++)
 		fscanf(fp,"%d",&data[i]);
 
@@ -49,159 +55,309 @@ for(a = 0;a < 100;a++){
 		}
 	}
 	//display
-	//for(i = 180;i <= 900;i++)
-		//printf("%d  x : %f   y : %f\n",i,x_t[i],y_t[i]);
+	for(i = 180;i <= 900;i++)
+		printf("%d  x : %f   y : %f\n",i,x_t[i],y_t[i]);
 	//Linear approximation
-	for(i = 230;i < 450;i++){
-		j = 1;
-		k = 0;
-		for(;;){
-			if(-0.1 < x_t[i] - x_t[i + j] && x_t[i] - x_t[i + j] < 0.1){
-				step[k] = i + j;
-				j++;
-				k++;
+	for(i = 180;i <= 900;i++){
+		for(j = 0;j < 10;j++){
+			if(j == 0){
+				max = x_t[i];
+				min = x_t[i];
+				step_max = i;
+				step_min = i;
 			}
-			else
-				j++;
-			if(i + j > 500)
-				break;
+			else if(max < x_t[i - j]){
+				max = x_t[i - j];
+				step_max = i - j;
+			}
+			else if(min > x_t[i - j]){
+				min = x_t[i - j];
+				step_min = i - j;
+			}
 		}
-		//printf("k : %d\n",k);
-		if(k >= 50){
+		for(j = 0;j < 10;j++){
+			if(i - j != step_max && i - j != step_min){
+				//printf("%d\n",i-j);
+				x_t_a[i] += x_t[i - j];
+			}
+		}
+		x_t_a[i] /= 8.0;
+	}
+	for(i = 180;i <= 900;i++){
+		for(j = 0;j < 10;j++){
+			if(j == 0){
+				max = y_t[i];
+				min = y_t[i];
+				step_max = i;
+				step_min = i;
+			}
+			else if(max < y_t[i - j]){
+				max = y_t[i - j];
+				step_max = i - j;
+			}
+			else if(min > y_t[i - j]){
+				min = y_t[i - j];
+				step_min = i - j;
+			}
+		}
+		for(j = 0;j < 10;j++){
+			if(i - j != step_max && i - j != step_min)
+				y_t_a[i] += y_t[i - j];
+		}
+		y_t_a[i] /= 8.0;
+	}
+	//for(i = 180;i <= 900;i++)
+		//printf("%d  x_t_a : %f   y_t_a : %f\n",i,x_t_a[i],y_t_a[i]);
+	//bottom line
+	i = 400;
+	k = 0;
+	while(1){
+		step[k] = i;
+		k++;
+		if(-0.1 > y_t[i] - y_t[i + 10] || 0.1 < y_t[i] - y_t[i + 10]){
+			if(-0.1 > y_t[i + 10] - y_t[i + 20] || 0.1 < y_t[i + 10] - y_t[i + 20]){
+				if(-0.1 > y_t[i + 20] - y_t[i + 30] || 0.1 < y_t[i + 20] - y_t[i + 30])
+					break;
+			}
+		}
+		i += 10;
+	}
+	//for(i = 0;i < k;i++)
+		//printf("%d %f %f\n",step[i],x_t_a[step[i]],y_t_a[step[i]]);
+	y_t_s = 0;
+	for(i = 0;i < k;i++)
+		y_t_s += y_t_a[step[i]];
+	y_t_s /= (float)k;
+	j = 0;
+	for(i = 0;i < k;i++){
+		if(-1.0 > y_t_a[step[i]] - y_t_s || 1.0 < y_t_a[step[i]] - y_t_s){
+			Farther_value[j] = step[i];
+			j++;
+		}
+	}
+	//sum
+	x_s = 0;
+	y_s = 0;
+	m = 0;
+	for(i = 0;i < k;i++){
+		Farther_flag = 0;
+		for(l = 0;l < j;l++){
+			if(step[i] == Farther_value[l]){
+				Farther_flag = 1;
+				m++;
+			}
+		}
+		if(Farther_flag != 1){
+			x_s += x_t_a[ step[i] ];
+			y_s += y_t_a[ step[i] ];
+		}
+	}
+	//display
+	//printf("x_s : %f   y_s : %f\n",x_s,y_s);
+	//average
+	x_a = x_s / (float)(k - m);
+	y_a = y_s / (float)(k - m);
+	//display
+	//printf("x_a : %f   y_a : %f\n",x_a,y_a);
+	//Linear equations
+	part_1 = 0;
+	part_2 = 0;
+	for(i = 0;i < k;i++){
+		Farther_flag = 0;
+		for(l = 0;l < j;l++){
+			if(step[i] == Farther_value[l])
+				Farther_flag = 1;
+		}
+		if(Farther_flag != 1){
+			part_1 += x_t_a[ step[i] ] * y_t_a[ step[i] ];
+			part_2 += pow( x_t_a[ step[i] ] , 2.0 );
+		}
+	}
+	//display
+	//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
+	a_2 = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
+	b_2 = y_a - (a_2 * x_a);
+	printf("a_2 : %lf     b_2 : %lf\n",a_2,b_2);
+	
+	//side line
+	for(i = 180;i < 400;i++){
+		j = i;
+		k = 0;
+		while(1){
+			step[k] = j;
+			k++;
+			if(-0.2 > x_t[j] - x_t[j + 10] || 0.2 < x_t[j] - x_t[j + 10]){
+				if(-0.2 > x_t[j + 10] - x_t[j + 20] || 0.2 < x_t[j + 10] - x_t[j + 20]){
+					if(-0.2 > x_t[j + 20] - x_t[j + 30] || 0.2 < x_t[j + 20] - x_t[j + 30]){
+						break;
+					}
+				}
+			}
+			//printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
+			j += 10;
+		}
+		if(k > 4){
+			x_t_s = 0;
+			for(n = 0;n < k;n++)
+				x_t_s += x_t_a[step[n]];
+			x_t_s /= (float)k;
+			j = 0;
+			for(n = 0;n < k;n++){
+				if(-1.0 > x_t_a[step[n]] - x_t_s || 1.0 < x_t_a[step[n]] - x_t_s){
+					Farther_value[j] = step[n];
+					j++;
+				}
+			}
 			//sum
 			x_s = 0;
-			for(j = 0;j < k;j++)
-					x_s += x_t[ step[j] ];
 			y_s = 0;
-			for(j = 0;j < k;j++)
-					y_s += y_t[ step[j] ];
+			m = 0;
+			for(n = 0;n < k;n++){
+				Farther_flag = 0;
+				for(l = 0;l < j;l++){
+					if(step[n] == Farther_value[l]){
+						Farther_flag = 1;
+						m++;
+					}
+				}
+				if(Farther_flag != 1){
+					x_s += x_t_a[ step[n] ];
+					y_s += y_t_a[ step[n] ];
+				}
+			}
 			//display
-		//	printf("x_s : %f   y_s : %f\n",x_s,y_s);
+			//printf("x_s : %f   y_s : %f\n",x_s,y_s);
 			//average
-			x_a = x_s / (float)k;
-			y_a = y_s / (float)k;
+			x_a = x_s / (float)(k - m);
+			y_a = y_s / (float)(k - m);
 			//display
 			//printf("x_a : %f   y_a : %f\n",x_a,y_a);
 			//Linear equations
 			part_1 = 0;
 			part_2 = 0;
-			for(j = 0;j < k;j++){
-				part_1 += x_t[ step[j] ] * y_t[ step[j] ];
-				part_2 += pow( x_t[ step[j] ] , 2.0 );
+			for(n = 0;n < k;n++){
+				Farther_flag = 0;
+				for(l = 0;l < j;l++){
+					if(step[n] == Farther_value[l])
+						Farther_flag = 1;
+				}
+				if(Farther_flag != 1){
+					part_1 += x_t_a[ step[n] ] * y_t_a[ step[n] ];
+					part_2 += pow( x_t_a[ step[n] ] , 2.0 );
+				}
 			}
 			//display
 			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
-			a_1 = ( part_1 - ((float)k * x_a * y_a) ) / ( part_2 - ( (float)k * pow(x_a , 2.0) ) );
-			b_1 = y_a - (a_1 * x_a);
-			//printf("%d  a : %lf     b : %lf\n",i,a_1,b_1);
-			flag = 1;
-			break;
+			a_1[i] = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
+			b_1[i] = y_a - (a_1[i] * x_a);
+			//printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
 		}
 	}
-	//printf("----------\n");
+	for(i = 180;i < 400;i++){
+		if(i == 180){
+			a_jdg = a_1[i] * a_2;
+			step_s = i;
+		}
+		else if(-1.0 - a_jdg > -1.0 - (a_1[i] * a_2)){
+			a_jdg = a_1[i] * a_2;
+			step_s = i;
+		}
+		if(-1.2 < a_jdg || a_jdg < -0.8)
+			flag = 1;
+	}
 
-	for(i = 850;i > 580;i--){
+	//printf("------------------\n");
+
+	//next side line
+	for(i = 900;i > 680;i--){
 		if(flag == 1)
 			break;
-		j = 1;
+		j = i;
 		k = 0;
-		for(;;){
-			if(-0.1 < x_t[i] - x_t[i - j] && x_t[i] - x_t[i - j] < 0.1){
-				step[k] = i - j;
-				j++;
-				k++;
+		while(1){
+			step[k] = j;
+			k++;
+			if(-0.2 > x_t[j] - x_t[j - 10] || 0.2 < x_t[j] - x_t[j - 10]){
+				if(-0.2 > x_t[j - 10] - x_t[j - 20] || 0.2 < x_t[j - 10] - x_t[j - 20]){
+					if(-0.2 > x_t[j - 20] - x_t[j - 30] || 0.2 < x_t[j - 20] - x_t[j - 30])
+						break;
+				}
 			}
-			else
-				j++;
-			if(i - j < 530)
-				break;
+			j += 10;
 		}
-		//printf("k : %d\n",k);
-		//for(j = 0;j < k;j++)
-			//printf("step[j] : %d\n",step[j]);
-		if(k >= 50){
+		if(k > 4){
+			x_t_s = 0;
+			for(i = 0;i < k;i++)
+				x_t_s += x_t_a[step[i]];
+			x_t_s /= (float)k;
+			j = 0;
+			for(i = 0;i < k;i++){
+				if(-1.0 > x_t_a[step[i]] - x_t_s || 1.0 < x_t_a[step[i]] - x_t_s){
+					Farther_value[j] = step[i];
+					j++;
+				}
+			}
 			//sum
 			x_s = 0;
-			for(j = 0;j < k;j++)
-					x_s += x_t[ step[j] ];
 			y_s = 0;
-			for(j = 0;j < k;j++)
-					y_s += y_t[ step[j] ];
+			m = 0;
+			for(i = 0;i < k;i++){
+				Farther_flag = 0;
+				for(l = 0;l < j;l++){
+					if(step[i] == Farther_value[l]){
+						Farther_flag = 1;
+						m++;
+					}
+				}
+				if(Farther_flag != 1){
+					x_s += x_t_a[ step[i] ];
+					y_s += y_t_a[ step[i] ];
+				}
+			}
 			//display
 			//printf("x_s : %f   y_s : %f\n",x_s,y_s);
 			//average
-			x_a = x_s / (float)k;
-			y_a = y_s / (float)k;
+			x_a = x_s / (float)(k - m);
+			y_a = y_s / (float)(k - m);
 			//display
 			//printf("x_a : %f   y_a : %f\n",x_a,y_a);
 			//Linear equations
 			part_1 = 0;
 			part_2 = 0;
-			for(j = 0;j < k;j++){
-				part_1 += x_t[ step[j] ] * y_t[ step[j] ];
-				part_2 += pow( x_t[ step[j] ] , 2.0 );
+			for(i = 0;i < k;i++){
+				Farther_flag = 0;
+				for(l = 0;l < j;l++){
+					if(step[i] == Farther_value[l])
+						Farther_flag = 1;
+				}
+				if(Farther_flag != 1){
+					part_1 += x_t_a[ step[i] ] * y_t_a[ step[i] ];
+					part_2 += pow( x_t_a[ step[i] ] , 2.0 );
+				}
 			}
 			//display
 			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
-			a_1 = ( part_1 - ((float)k * x_a * y_a) ) / ( part_2 - ( (float)k * pow(x_a , 2.0) ) );
-			b_1 = y_a - (a_1 * x_a);
-			//printf("%d  a : %lf     b : %lf\n",i,a_1,b_1);
-			break;
+			a_1[i] = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
+			b_1[i] = y_a - (a_1[i] * x_a);
 		}
 	}
-
-	//bottom line
-	for(i = 300;i <= 700;i++){
-		j = 1;
-		k = 0;
-		for(;;){
-			if(-1.0 < y_t[i] - y_t[i + j] && y_t[i] - y_t[i + j] < 1.0){
-				step[k] = i + j;
-				j++;
-				k++;
-			}
-			else
-				j++;
-			if(i + j > 700)
-				break;
-		}
-		//printf("k : %d\n",k);
-		if(k >= 50){
-			//sum
-			x_s = 0;
-			for(j = 0;j < k;j++)
-					x_s += x_t[ step[j] ];
-			y_s = 0;
-			for(j = 0;j < k;j++)
-					y_s += y_t[ step[j] ];
-			//display
-			//printf("x_s : %f   y_s : %f\n",x_s,y_s);
-			//average
-			x_a = x_s / (float)k;
-			y_a = y_s / (float)k;
-			//display
-			//printf("x_a : %f   y_a : %f\n",x_a,y_a);
-			//Linear equations
-			part_1 = 0;
-			part_2 = 0;
-			for(j = 0;j < k;j++){
-				part_1 += x_t[ step[j] ] * y_t[ step[j] ];
-				part_2 += pow( x_t[ step[j] ] , 2.0 );
-			}
-			//display
-			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
-			a_2 = ( part_1 - ((float)k * x_a * y_a) ) / ( part_2 - ( (float)k * pow(x_a , 2.0) ) );
-			b_2 = y_a - (a_2 * x_a);
-			//printf("%d  a : %lf     b : %lf\n",i,a_2,b_2);
+	for(i = 180;i < 900;i++){
+		if(flag == 1)
 			break;
+		if(i = 180){
+			a_jdg = a_1[i] * a_2;
+			step_s = i;
+		}
+		else if(-1.0 - a_jdg > -1.0 - (a_1[i] * a_2)){
+			a_jdg = a_1[i] * a_2;
+			step_s = i;
 		}
 	}
+	printf("%d  a_1 : %lf     b_1 : %lf\n",step_s,a_1[step_s],b_1[step_s]);
 	
-	//printf("---------------------\n");
-
 	//corner
-	x_c = (b_2 - b_1) / (a_1 - a_2);
-	y_c = (a_1 * x_c) + b_1;
+	x_c = (b_2 - b_1[step_s]) / (a_1[step_s] - a_2);
+	y_c = (a_1[step_s] * x_c) + b_1[step_s];
 	//printf("x_c : %f   y_c : %f\n",x_c,y_c);
 	//reverse corner
 	if(flag == 1){
@@ -274,7 +430,7 @@ for(a = 0;a < 100;a++){
 	//printf("stddeg : %lf    cmpdeg : %lf\n",stddeg,cmpdeg);
 	//printf("slope : %lf [deg]\n",slope);
 printf("%f %f %lf\n",x,y,slope);
-}
+//}
 fclose(fp);
 
 	return 0;
