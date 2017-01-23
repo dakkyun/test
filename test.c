@@ -264,9 +264,8 @@ int main()
 			//printf("%d  a_jdg : %f\n",i,a_jdg);
 		}
 		if(-1.2 < a_jdg && -0.8 > a_jdg){
-			printf("a_jdg : %f\n",a_jdg);
+			//printf("a_jdg : %f\n",a_jdg);
 			flag = 1;
-			break;
 		}
 	}
 
