@@ -37,7 +37,7 @@ int main()
 	double x_t_s,y_t_s;
 	double a_jdg;
 	
-	fp = fopen("minus20deg.txt","r");
+	fp = fopen("test.txt","r");
 //for(a = 0;a < 100;a++){
 	for(i = 0;i < 1081;i++)
 		fscanf(fp,"%d",&data[i]);
@@ -186,14 +186,14 @@ int main()
 		while(1){
 			step[k] = j;
 			k++;
-			if(-0.1 > x_t[j] - x_t[j + 10] || 0.1 < x_t[j] - x_t[j + 10]){
-				if(-0.1 > x_t[j + 10] - x_t[j + 20] || 0.1 < x_t[j + 10] - x_t[j + 20]){
-					if(-0.1 > x_t[j + 20] - x_t[j + 30] || 0.1 < x_t[j + 20] - x_t[j + 30]){
+			if(-0.08 > x_t[j] - x_t[j + 10] || 0.08 < x_t[j] - x_t[j + 10]){
+				if(-0.08 > x_t[j + 10] - x_t[j + 20] || 0.08 < x_t[j + 10] - x_t[j + 20]){
+					if(-0.08 > x_t[j + 20] - x_t[j + 30] || 0.08 < x_t[j + 20] - x_t[j + 30]){
 						break;
 					}
 				}
 			}
-			printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
+			//printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
 			j += 10;
 		}
 		if(k > 4){
@@ -250,7 +250,7 @@ int main()
 			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
 			a_1[i] = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
 			b_1[i] = y_a - (a_1[i] * x_a);
-			printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
+			//printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
 		}
 	}
 	for(i = 180;i < 400;i++){
@@ -258,13 +258,17 @@ int main()
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
 		}
-		else if(-1.0 - a_jdg > -1.0 - (a_1[i] * a_2)){
+		else if(fabs(-1.0 - a_jdg) > fabs(-1.0 - (a_1[i] * a_2))){
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
+			//printf("%d  a_jdg : %f\n",i,a_jdg);
+		}
+		if(-1.2 < a_jdg && -0.8 > a_jdg){
+			printf("a_jdg : %f\n",a_jdg);
+			flag = 1;
+			break;
 		}
 	}
-	if(-1.2 < a_jdg && -0.8 > a_jdg)
-		flag = 1;
 
 	//printf("------------------\n");
 
@@ -277,14 +281,14 @@ int main()
 		while(1){
 			step[k] = j;
 			k++;
-			if(-0.1 > x_t[j] - x_t[j - 10] || 0.1 < x_t[j] - x_t[j - 10]){
-				if(-0.1 > x_t[j - 10] - x_t[j - 20] || 0.1 < x_t[j - 10] - x_t[j - 20]){
-					if(-0.1 > x_t[j - 20] - x_t[j - 30] || 0.1 < x_t[j - 20] - x_t[j - 30]){
+			if(-0.08 > x_t[j] - x_t[j - 10] || 0.08 < x_t[j] - x_t[j - 10]){
+				if(-0.08 > x_t[j - 10] - x_t[j - 20] || 0.08 < x_t[j - 10] - x_t[j - 20]){
+					if(-0.08 > x_t[j - 20] - x_t[j - 30] || 0.08 < x_t[j - 20] - x_t[j - 30]){
 						break;
 					}
 				}
 			}
-			printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
+			//printf("%d  x_t_a : %f  y_t_a : %f\n",j,x_t_a[j],y_t_a[j]);
 			j -= 10;
 		}
 		if(k > 4){
@@ -341,7 +345,7 @@ int main()
 			//printf("part_1 : %f   part_2 : %f\n",part_1,part_2);
 			a_1[i] = ( part_1 - ((float)(k - m) * x_a * y_a) ) / ( part_2 - ( (float)(k - m) * pow(x_a , 2.0) ) );
 			b_1[i] = y_a - (a_1[i] * x_a);
-			printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
+			//printf("%d  a_1 : %f  b_1 : %f\n",i,a_1[i],b_1[i]);
 		}
 	}
 	for(i = 900;i > 680;i--){
@@ -351,11 +355,11 @@ int main()
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
 		}
-		else if(-1.0 - a_jdg > -1.0 - (a_1[i] * a_2)){
+		else if(fabs(-1.0 - a_jdg) > fabs(-1.0 - (a_1[i] * a_2))){
 			a_jdg = a_1[i] * a_2;
 			step_s = i;
 		}
-		printf("%d\n",step_s);
+		//printf("%d\n",step_s);
 	}
 	printf("%d  a_1 : %lf     b_1 : %lf\n",step_s,a_1[step_s],b_1[step_s]);
 	
